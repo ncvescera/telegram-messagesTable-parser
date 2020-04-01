@@ -45,7 +45,11 @@ def blob_parser(data: "str.binary_string") -> "str.parsed_message":
     try:
         result = data[start_msg:(start_msg+ln)].decode("utf-8")
     except Exception:
-        result = data[start_msg:(start_msg+ln)]
+        offset_len_msg = 31     # l'offset della lunghezza del messaggio
+        start_msg = 32          # potrebbe essere anche 32 dipende da offset_len_msg
+
+        ln = data[offset_len_msg]
+        result = data[start_msg:(start_msg+ln)].decode("utf-8")
 
     return result
 
