@@ -55,14 +55,18 @@ def get_messages(uid: "str.user_id", db_path: str) -> "list.messages":
 
     # usare questa sezione per aggiungere altre query ...
     query = f"select uid, date, data, out from messages where uid = {uid}  order by date asc"
-    
+    get_name = f"select name from users where uid = {uid}"
+
     c.execute(query)
     
     data = c.fetchall()
-    
+
+    c.execute(get_name)
+    name = c.fetchall()
+
     conn.close()
 
-    return data
+    return (name[0], data)
 
 
 # 532005619
@@ -74,7 +78,7 @@ def main():
         print("Missing UID ...")
         quit()
     
-    data = get_messages(sys.argv[1], db_path)
+    name, data = get_messages(sys.argv[1], db_path)
 
     # parsing dei messaggi
     for i in range(len(data)):
@@ -85,10 +89,14 @@ def main():
         else:
             type_ = "out"   # messaggio inviato
 
-        print(i+1, data[i][0],  type_, time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime(data[i][1])), blob_parser(data[i][2]))
+        print(i+1, name,  type_, time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime(data[i][1])), blob_parser(data[i][2]))
+        # print(i+1, data[i][0],  type_, time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime(data[i][1])), blob_parser(data[i][2]))
         # print(i+1, data[i][0],  type_, time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime(data[i][1])), parse_telegram_messages(data[i][2]))
         # print(i+1, data[i][2].decode("ascii", "ignore"))
     
+    print("")
+    print("-" * 100)
+    print(f"Messages from/to {name} ({data[0][0]})\n")
 
 if __name__ == "__main__":
     main()
