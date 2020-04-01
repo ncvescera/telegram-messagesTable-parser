@@ -72,7 +72,7 @@ def get_messages(uid: "str.user_id", db_path: str) -> "list.messages":
 
     conn.close()
 
-    return (name[0], data)
+    return (name[0][0], data)
 
 
 # 532005619
@@ -85,7 +85,7 @@ def main():
         quit()
 
     name, data = get_messages(sys.argv[1], db_path)
-
+    name = '(' + '/'.join(name.split(';;;')) + ')'
     # parsing dei messaggi
     for i in range(len(data)):
         type_ = ""
