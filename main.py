@@ -23,7 +23,8 @@ def blob_parser(data: "binary string"):
 
 # 532005619
 def main():
-    conn = sqlite3.connect('cache4.db')
+    db_path = 'cache4.db'
+    conn = sqlite3.connect(db_path)
 
     if len(sys.argv) <= 1:
         quit()
