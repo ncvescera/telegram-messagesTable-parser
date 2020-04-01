@@ -30,10 +30,9 @@ def blob_parser(data: "str.binary_string") -> "str.parsed_message":
     # do per scontato che tutti i messaggi siano del tipo "tra due utenti"
 
     type_ = check_type(data)    # tipo del messaggio, se None è un normale messaggio di testo
-    
-    if type_ != None:
-        return f"-{type_}-"
 
+    if type_ is not None:
+        return f"-{type_}-"
 
     offset_len_msg = 28     # l'offset della lunghezza del messaggio
     start_msg = 29          # potrebbe essere anche 32 dipende da offset_len_msg
@@ -42,16 +41,20 @@ def blob_parser(data: "str.binary_string") -> "str.parsed_message":
 
     result = ""
 
+    # se c'è un problema con la visualizzazione passo a considerare il messaggio come una "Risposta a messaggio"
+    # le "Risposte a messaggio" rompono un po la visualizzazione
+    # devo capire come gestirle, ma pare che in posizione 31 abbiano la lunghezza del messaggio ...
     try:
         result = data[start_msg:(start_msg+ln)].decode("utf-8")
     except Exception:
-        offset_len_msg = 31     # l'offset della lunghezza del messaggio
-        start_msg = 32          # potrebbe essere anche 32 dipende da offset_len_msg
+        offset_len_msg = 31
+        start_msg = 32
 
         ln = data[offset_len_msg]
-        result = data[start_msg:(start_msg+ln)].decode("utf-8")
+        result = data[start_msg:(start_msg+ln)].decode("utf-8", "ignore")
 
     return result
+
 
 def get_messages(uid: "str.user_id", db_path: str) -> "list.messages":
     conn = sqlite3.connect(db_path)
@@ -62,7 +65,6 @@ def get_messages(uid: "str.user_id", db_path: str) -> "list.messages":
     get_name = f"select name from users where uid = {uid}"
 
     c.execute(query)
-    
     data = c.fetchall()
 
     c.execute(get_name)
@@ -76,12 +78,12 @@ def get_messages(uid: "str.user_id", db_path: str) -> "list.messages":
 # 532005619
 def main():
     db_path = 'cache4.db'
-    
+
     # devo specificare l'id che voglio cercare
     if len(sys.argv) <= 1:
         print("Missing UID ...")
         quit()
-    
+
     name, data = get_messages(sys.argv[1], db_path)
 
     # parsing dei messaggi
@@ -97,10 +99,11 @@ def main():
         # print(i+1, data[i][0],  type_, time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime(data[i][1])), blob_parser(data[i][2]))
         # print(i+1, data[i][0],  type_, time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime(data[i][1])), parse_telegram_messages(data[i][2]))
         # print(i+1, data[i][2].decode("ascii", "ignore"))
-    
+
     print("")
     print("-" * 100)
     print(f"Messages from/to {name} ({data[0][0]})\n")
+
 
 if __name__ == "__main__":
     main()
