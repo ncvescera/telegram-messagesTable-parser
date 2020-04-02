@@ -95,7 +95,7 @@ def main():
         else:
             type_ = "out"   # messaggio inviato
 
-        print(i+1, name,  type_, time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime(data[i][1])), blob_parser(data[i][2]))
+        print(i+1, name,  type_, time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime(data[i][1])), str(blob_parser(data[i][2])).replace('\n', ' '))
         # print(i+1, data[i][0],  type_, time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime(data[i][1])), blob_parser(data[i][2]))
         # print(i+1, data[i][0],  type_, time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime(data[i][1])), parse_telegram_messages(data[i][2]))
         # print(i+1, data[i][2].decode("ascii", "ignore"))
